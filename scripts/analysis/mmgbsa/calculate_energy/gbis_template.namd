@@ -1,0 +1,103 @@
+# gbis_template.namd
+# NAMD Config for MMGBSA (GBIS) - Full Parameter List
+
+# 1. 定義變數 (由 worker_mmgbsa.sh 透過 sed 替換)
+set SYS %SYS%
+set REP %REP%
+
+# 2. 設定參數檔路徑 (將原本寫死的路徑改為變數，由外部傳入)
+paraTypeCharmm on 
+set CHARMM_BASEDIR %TOPPARDIR%
+
+# 3. 完整參數列表 (保留你提供的所有項目)
+parameters ${CHARMM_BASEDIR}/par_all36m_prot.prm
+parameters ${CHARMM_BASEDIR}/par_all36_na.prm
+parameters ${CHARMM_BASEDIR}/par_all36_carb.prm
+parameters ${CHARMM_BASEDIR}/par_all36_lipid.prm
+parameters ${CHARMM_BASEDIR}/par_all36_cgenff.prm
+parameters ${CHARMM_BASEDIR}/par_interface.prm
+parameters ${CHARMM_BASEDIR}/toppar_all36_moreions.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_nano_lig.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_nano_lig_patch.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_synthetic_polymer.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_synthetic_polymer_patch.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_polymer_solvent.str
+parameters ${CHARMM_BASEDIR}/toppar_water_ions.str
+parameters ${CHARMM_BASEDIR}/toppar_dum_noble_gases.str
+parameters ${CHARMM_BASEDIR}/toppar_ions_won.str
+parameters ${CHARMM_BASEDIR}/cam.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_arg0.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_c36m_d_aminoacids.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_fluoro_alkanes.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_heme.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_na_combined.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_retinol.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_model.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_prot_modify_res.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_na_nad_ppi.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_na_rna_modified.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_sphingo.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_archaeal.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_bacterial.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_cardiolipin.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_cholesterol.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_dag.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_inositol.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_lnp.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_lps.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_mycobacterial.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_miscellaneous.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_model.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_prot.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_tag.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_yeast.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_hmmm.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_detergent.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_ether.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_lipid_oxidized.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_carb_glycolipid.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_carb_glycopeptide.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_carb_imlab.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_label_spin.str
+parameters ${CHARMM_BASEDIR}/toppar_all36_label_fluorophore.str
+
+# 自定義參數檔 (維持你指定的絕對路徑)
+parameters /dicos_ui_home/chrysaliso/G4/TO_center_ion_1031/score606/tog.prm 
+
+structure    ${SYS}.psf
+coordinates  ${SYS}.pdb
+
+# 讓 outputname 包含 rep 編號，避免檔案覆蓋
+outputname   gb_bnm_rep${REP}_${SYS}
+
+numsteps 0 
+
+GBIS on 
+solventDielectric 74.69 
+ionConcentration 0.3 
+alphaCutoff 14
+switching on 
+switchdist 9. 
+cutoff 16
+pairlistdist 18
+
+sasa on
+surfaceTension 0.0072 
+timestep 1 
+nonbondedFreq 1
+fullElectFrequency 1
+exclude scaled1-4 
+temperature 310
+set ts 0
+
+# 4. [重要修正] 讀取軌跡檔
+# 這裡將 rep1 改為變數 rep${REP}，這樣才能根據不同 replica 讀取對應檔案
+# 並將 %SYS% 改為 ${SYS} 以使用上方 set 的變數
+coorfile open dcd ${SYS}-rep${REP}-formmgbsa.dcd  
+
+while { ![coorfile read] } { 
+    firstTimestep $ts 
+    run 0
+    incr ts 1
+} 
+coorfile close
