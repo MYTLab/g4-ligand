@@ -1,0 +1,22 @@
+{
+  "vmd_executable": "C:/Program Files/University of Illinois/VMD/vmd.exe",
+  "namd_executable": "C:/Tools/NAMD/namd3.exe",
+  "toppar_dir": "C:/MMGBSA/toppar",
+  "ligand_parameter": "C:/MMGBSA/parameters/tog.prm",
+  "psf": "C:/MMGBSA/input/step3_input.psf",
+  "pdb": "C:/MMGBSA/input/step3_input.pdb",
+  "coor": "C:/MMGBSA/input/G4_TO_center.coor",
+  "output_dir": "C:/MMGBSA/output/system_rep",
+  "target_segid": "DNAA",
+  "ligand_segid": "HETA",
+  "stride": 1,
+  "cores": 4,
+  "energy_filter_min": -8000.0,
+  "energy_filter_max": 1000.0,
+  "replicas": [
+    {
+      "number": 1,
+      "dcd": "C:/MMGBSA/input/trajectory_rep1.dcd"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+# NAMD/GBIS MM/GBSA template for Windows
+set SYS %SYS%
+set REP %REP%
+
+paraTypeCharmm on
+set CHARMM_BASEDIR {%TOPPARDIR%}
+
+parameters "${CHARMM_BASEDIR}/par_all36m_prot.prm"
+parameters "${CHARMM_BASEDIR}/par_all36_na.prm"
+parameters "${CHARMM_BASEDIR}/par_all36_carb.prm"
+parameters "${CHARMM_BASEDIR}/par_all36_lipid.prm"
+parameters "${CHARMM_BASEDIR}/par_all36_cgenff.prm"
+parameters "${CHARMM_BASEDIR}/par_interface.prm"
+parameters "${CHARMM_BASEDIR}/toppar_all36_moreions.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_nano_lig.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_nano_lig_patch.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_synthetic_polymer.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_synthetic_polymer_patch.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_polymer_solvent.str"
+parameters "${CHARMM_BASEDIR}/toppar_water_ions.str"
+parameters "${CHARMM_BASEDIR}/toppar_dum_noble_gases.str"
+parameters "${CHARMM_BASEDIR}/toppar_ions_won.str"
+parameters "${CHARMM_BASEDIR}/cam.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_arg0.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_c36m_d_aminoacids.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_fluoro_alkanes.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_heme.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_na_combined.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_retinol.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_model.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_prot_modify_res.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_na_nad_ppi.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_na_rna_modified.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_sphingo.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_archaeal.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_bacterial.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_cardiolipin.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_cholesterol.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_dag.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_inositol.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_lnp.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_lps.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_mycobacterial.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_miscellaneous.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_model.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_prot.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_tag.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_yeast.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_hmmm.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_detergent.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_ether.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_lipid_oxidized.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_carb_glycolipid.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_carb_glycopeptide.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_carb_imlab.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_label_spin.str"
+parameters "${CHARMM_BASEDIR}/toppar_all36_label_fluorophore.str"
+parameters {%LIGAND_PRM%}
+
+structure "${SYS}.psf"
+coordinates "${SYS}.pdb"
+outputname "gb_bnm_rep${REP}_${SYS}"
+
+numsteps 0
+GBIS on
+solventDielectric 74.69
+ionConcentration 0.3
+alphaCutoff 14
+switching on
+switchdist 9.0
+cutoff 16
+pairlistdist 18
+sasa on
+surfaceTension 0.0072
+timestep 1
+nonbondedFreq 1
+fullElectFrequency 1
+exclude scaled1-4
+temperature 310
+set ts 0
+
+coorfile open dcd "${SYS}-rep${REP}-formmgbsa.dcd"
+while { ![coorfile read] } {
+    firstTimestep $ts
+    run 0
+    incr ts 1
+}
+coorfile close
