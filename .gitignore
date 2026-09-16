@@ -1,0 +1,8 @@
+*.dcd
+*.coor
+*.vel
+*.xsc
+*.xst
+*.log
+slurm-*.out
+*.BAK
