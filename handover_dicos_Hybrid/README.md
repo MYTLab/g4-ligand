@@ -28,7 +28,7 @@ AutoDock 4.2 準備，全部初始 PDB 由提供者另外放入 `pdb/`。
 - `pdb/`：提供者自行放入所有已準備的初始 pose；不是溶劑化後的 PDB。
 - `scripts/preflight.sh`：只檢查輸入，不執行 MD。
 - `reference/original/`：原始設定及 `add2.tcl`，保留供比對，不作為正式提交入口。
-- `reference/screenshots/`：三張 CHARMM-GUI 選项截圖。
+- `reference/screenshots/`：三張 CHARMM-GUI 選項截圖。
 - `VALIDATION.md`：本地檢查與尚未驗證的項目。
 
 操作版三份 `.conf` 的輸入位置依自身目錄決定，共用上一層 `toppar/`，
@@ -50,7 +50,7 @@ AutoDock 4.2 準備，全部初始 PDB 由提供者另外放入 `pdb/`。
 | 水模型 | PDB 有 TIP 水；完整模型定義仍需隨實際 toppar 核對，不能只憑 residue 名稱證明 |
 | 溫度 | 303.15 K |
 | NAMD | 提交腳本沿用提供者的 `namd3.0.1.sif`；實際版本需由 log 確認 |
-| 計算資源 | 原提交選项：v100-al9、1 GPU、1 CPU；可用性由當下 DICOS 環境確認 |
+| 計算資源 | 原提交選項：v100-al9、1 GPU、1 CPU；可用性由當下 DICOS 環境確認 |
 
 GUI 的 70 顆 K⁺／48 顆 Cl⁻ 顯示為溶劑離子估算；目前範例 PDB 也有 70 顆 POT／48 顆 CLA。
 這些數字不能單獨辨認哪三顆位於通道，交接不以離子總數作為通道離子位置的證明。
@@ -70,7 +70,7 @@ GUI 的 70 顆 K⁺／48 顆 Cl⁻ 顯示為溶劑離子估算；目前範例 PD
 
 ### 4.2 CHARMM-GUI
 
-以下為提供者的建模選项，不是自動化瀏覽器流程：
+以下為提供者的建模選項，不是自動化瀏覽器流程：
 
 1. 上傳未溶劑化 PDB。
 2. PDB Reader 保留 DNA、TO 與已放好的中央 K⁺；截圖中的 DNAA/HETA 清單
@@ -82,7 +82,7 @@ GUI 的 70 顆 K⁺／48 顆 Cl⁻ 顯示為溶劑離子估算；目前範例 PD
 7. 選 NAMD，equilibration NVT、dynamics NPT，temperature 303.15 K。
 8. 下載整套結果，保留原始建模輸出，以便核對 PBC 與參數。
 
-GUI 是互動步骤，網站介面可能變動。以本包圖片紀錄設定意圖，不聲稱目前介面已線上驗證。
+GUI 是互動步驟，網站介面可能變動。以本包圖片記錄設定意圖，不聲稱目前介面已線上驗證。
 
 ### 4.3 把建模結果放到模擬資料夾
 
@@ -111,7 +111,7 @@ prot_posres.ref
 ### 5.2 核對 PBC
 
 82 Å 水盒與 102 Å 週期盒必須對照建模結果與後續處理記錄。
-如果有擴盒、重新溶劑化或其他步骤，記錄其來源；不能只因名稱不同就當成互不相關。
+如果有擴盒、重新溶劑化或其他步驟，記錄其來源；不能只因名稱不同就當成互不相關。
 如果改動 `.conf` 的盒子，保留修改原因與前後數值，不能直接把 102 改成 82 便宣布已驗證。
 
 完成對照後，編輯 `551/PBC_REVIEW.txt`：
@@ -158,9 +158,9 @@ sbatch G4_md.sh
 
 提交腳本按順序執行：
 
-| 階段 | 起點 | 執行量 | 限制／系综 | 成功後產生 |
+| 階段 | 起點 | 執行量 | 限制／系綜 | 成功後產生 |
 |---|---|---|---|---|
-| 最小化 | `step3_input.pdb` | 10,000 steps | NVT 設定内執行，位置限制開啟 | 接著開始 NVT |
+| 最小化 | `step3_input.pdb` | 10,000 steps | NVT 設定內執行，位置限制開啟 | 接著開始 NVT |
 | NVT | 最小化後 | 50,000 × 2 fs = 100 ps | 固定盒子；位置限制開啟 | `G4_TO_nvt.restart.*` |
 | NPT | NVT restart coor/vel/xsc | 1,000,000 × 2 fs = 2 ns | 壓力控制開啟；位置限制開啟 | `G4_TO_npt.restart.*` |
 | Production | NPT restart coor/vel/xsc | 50,000,000 × 2 fs = 100 ns | NPT；位置限制關閉 | `G4_TO_551.dcd` 與 restart |
@@ -168,14 +168,14 @@ sbatch G4_md.sh
 保留原設定：303.15 K、rigidBonds all、PME、cutoff 12 Å、switch 10 Å、pairlist 14 Å、
 NVT 每 1,000 steps 重新指派速度、GPUresident on。
 NPT 壓力 target 1.01325 bar。每 1,000 steps 輸出一次，即每 2 ps，不是原註解的 1 ps。
-每階段的 `firsttimestep` 沿用 0；這三段不是以連續 timestep 编號保存。
+每階段的 `firsttimestep` 沿用 0；這三段不是以連續 timestep 編號保存。
 
 腳本使用原提供者的 `singularity run ... namd3` 呼叫形式，並 bind 整份交接包。
 映像檔的 runscript 是否接受此形式，仍需 DICOS 實跑驗證。
 
 ## 7. 如何判斷是否完成
 
-提交後记录 job ID，查詢排程：
+提交後記錄 job ID，查詢排程：
 
 ```bash
 squeue -u "$USER"
@@ -195,19 +195,19 @@ tail -n 40 md.log
 
 尚未開始的階段可能沒有 log，屬正常。
 腳本只會在前一個命令成功、log 含 `End of program`、restart coor/vel/xsc 均存在後繼續。
-若你使用的映像正常结束標記不同，先核對实际成功 log，再調整檢查，不要直接移除。
+若你使用的映像正常結束標記不同，先核對實際成功 log，再調整檢查，不要直接移除。
 
-正式完成須同時確認 Slurm 為 COMPLETED／ExitCode 0、三階段正常结束、正式 MD 到達預定步數，
+正式完成須同時確認 Slurm 為 COMPLETED／ExitCode 0、三階段正常結束、正式 MD 到達預定步數，
 且 `.dcd` 與 restart 存在。檔案存在本身不是完成證明。
 
 ## 8. 重跑、接續與其他系統
 
 `G4_md.sh` 是 **全新起跑** 的腳本，不是自動續跑腳本。
-若已有 log 或主要 restart，它會停止以避免覆蓋。不要删除結果來繞過檢查。
+若已有 log 或主要 restart，它會停止以避免覆蓋。不要刪除結果來繞過檢查。
 重跑請用新的工作資料夾；中斷續跑需要另行設定實際 restart、timestep 與剩餘步數，
 本包尚未附已驗證的續跑入口。
 
-其他系統可以參照 551 的資料夾结构，但要換成自己的 PSF/PDB/限制檔，
+其他系統可以參照 551 的資料夾結構，但要換成自己的 PSF/PDB/限制檔，
 核對 PBC、TO 參數與輸出名稱；不能只替換 551 初始 pose 就沿用 551 的溶劑化 PSF。
 多 replica 的隨機種子與獨立初始化方式尚待提供者補充，本包只交接一個範例。
 
@@ -216,21 +216,11 @@ tail -n 40 md.log
 | 情況 | 先處理什麼 |
 |---|---|
 | 找不到 toppar／tog.prm | 檢查參數是否放在根目錄 `toppar/`，檔名是否一致 |
-| UNABLE TO FIND ANGLE PARAMETERS 等 | 參數内容不完整；交由提供者核對 TO 參數，不隨意補值 |
+| UNABLE TO FIND ANGLE PARAMETERS 等 | 參數內容不完整；交由提供者核對 TO 參數，不隨意補值 |
 | 找不到 NVT／NPT restart | 前一階段未完成，或沒有從工作資料夾提交 |
 | 容器看不到輸入 | 確認 package bind 路徑與映像檔入口 |
 | Existing result | 使用新工作資料夾，或制定續跑方案；不要覆蓋原結果 |
 | PBC review pending | 核對建模週期盒與座標，完成記錄後才提交 |
-| 最後只有 All finished 字樣 | 本包已改为错误时停止；仍須看 Slurm、log 與预定步数 |
-
-## 10. 提供者完成交接前清單
-
-- [ ] 放入全部未溶劑化初始 PDB，標明 model 與中央離子狀態。
-- [ ] 放入完整 toppar、tog.prm 與 TO 參數來源／修訂資訊。
-- [ ] 補上水模型与 PBC（82／102 Å）的核對依據。
-- [ ] 說明 `prot_posres.ref` 的建立方法，供未来新建系統使用。
-- [ ] 在 DICOS 用操作版跑完一個範例，保存 job ID、實際版本、成功 log。
-- [ ] 確认从登入節點提交到计算节点的路徑均可用。
-- [ ] 若擴充多 replica／中斷續跑，再補獨立種子与续跑说明。
+| 最後只有 All finished 字樣 | 本包已改為錯誤時停止；仍須看 Slurm、log 與預定步數 |
 
 完成以上項目並更新 VALIDATION.md 後，才把交接包標為「已驗證可運行」。
