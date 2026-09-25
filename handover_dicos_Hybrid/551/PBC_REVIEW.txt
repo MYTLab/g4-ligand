@@ -1,2 +1,0 @@
-STATUS=PENDING
-EVIDENCE=Record the source of the 102-A initial cell and its compatibility with the solvated coordinates; then change STATUS to CONFIRMED after review.
